@@ -1,0 +1,30 @@
+{
+  "name": "developer-reputation-system",
+  "version": "1.0.0",
+  "description": "Quantitative assessment of blockchain developers based on open-source contributions",
+  "main": "web3/src/index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.js",
+    "node": "hardhat node"
+  },
+  "keywords": [
+    "reputation",
+    "blockchain",
+    "developer",
+    "metrics",
+    "web3",
+    "scoring"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "ethers": "^6.9.0"
+  }
+}
