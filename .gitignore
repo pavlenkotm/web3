@@ -39,3 +39,49 @@
 
 # debug information files
 *.dwo
+
+# CMake Build directories
+build/
+build-*/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Hardhat
+cache/
+artifacts/
+contracts/cache/
+contracts/artifacts/
+typechain/
+typechain-types/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Deployment files
+deployment.json
+deployments/
+
+# Logs
+logs/
+*.log
