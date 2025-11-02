@@ -1,0 +1,31 @@
+{
+  "name": "dex-trading-engine",
+  "version": "1.0.0",
+  "description": "High-performance DEX trading engine with C++ orderbook and Web3 integration",
+  "main": "web3/src/index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.js",
+    "node": "hardhat node"
+  },
+  "keywords": [
+    "dex",
+    "web3",
+    "blockchain",
+    "trading",
+    "orderbook",
+    "cpp"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "ethers": "^6.9.0",
+    "web3": "^4.3.0"
+  }
+}
