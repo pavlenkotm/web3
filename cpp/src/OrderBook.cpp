@@ -36,81 +36,122 @@ std::vector<Trade> OrderBook::matchOrder(OrderPtr newOrder) {
 
     if (newOrder->type == OrderType::MARKET) {
         // Market orders match at any price
-        auto& oppositeBook = (newOrder->side == OrderSide::BUY) ? asks_ : bids_;
+        if (newOrder->side == OrderSide::BUY) {
+            // Buy order matches against asks
+            while (!newOrder->isFilled() && !asks_.empty()) {
+                auto& [price, orders] = *asks_.begin();
 
-        while (!newOrder->isFilled() && !oppositeBook.empty()) {
-            auto& [price, orders] = *oppositeBook.begin();
+                while (!newOrder->isFilled() && !orders.empty()) {
+                    auto oppositeOrder = orders.front();
 
-            while (!newOrder->isFilled() && !orders.empty()) {
-                auto oppositeOrder = orders.front();
+                    double matchPrice = oppositeOrder->price;
+                    double matchQuantity = std::min(
+                        newOrder->getRemainingQuantity(),
+                        oppositeOrder->getRemainingQuantity()
+                    );
 
-                double matchPrice = oppositeOrder->price;
-                double matchQuantity = std::min(
-                    newOrder->getRemainingQuantity(),
-                    oppositeOrder->getRemainingQuantity()
-                );
+                    auto trade = executeTrade(newOrder, oppositeOrder, matchPrice, matchQuantity);
+                    trades.push_back(trade);
 
-                auto trade = executeTrade(
-                    (newOrder->side == OrderSide::BUY) ? newOrder : oppositeOrder,
-                    (newOrder->side == OrderSide::SELL) ? newOrder : oppositeOrder,
-                    matchPrice,
-                    matchQuantity
-                );
+                    if (oppositeOrder->isFilled()) {
+                        orders.erase(orders.begin());
+                    }
+                }
 
-                trades.push_back(trade);
-
-                // Remove filled order
-                if (oppositeOrder->isFilled()) {
-                    orders.erase(orders.begin());
+                if (orders.empty()) {
+                    asks_.erase(asks_.begin());
                 }
             }
+        } else {
+            // Sell order matches against bids
+            while (!newOrder->isFilled() && !bids_.empty()) {
+                auto& [price, orders] = *bids_.begin();
 
-            // Remove empty price level
-            if (orders.empty()) {
-                oppositeBook.erase(oppositeBook.begin());
+                while (!newOrder->isFilled() && !orders.empty()) {
+                    auto oppositeOrder = orders.front();
+
+                    double matchPrice = oppositeOrder->price;
+                    double matchQuantity = std::min(
+                        newOrder->getRemainingQuantity(),
+                        oppositeOrder->getRemainingQuantity()
+                    );
+
+                    auto trade = executeTrade(oppositeOrder, newOrder, matchPrice, matchQuantity);
+                    trades.push_back(trade);
+
+                    if (oppositeOrder->isFilled()) {
+                        orders.erase(orders.begin());
+                    }
+                }
+
+                if (orders.empty()) {
+                    bids_.erase(bids_.begin());
+                }
             }
         }
     } else {
         // Limit orders match only at acceptable prices
-        auto& oppositeBook = (newOrder->side == OrderSide::BUY) ? asks_ : bids_;
+        if (newOrder->side == OrderSide::BUY) {
+            // Buy order matches against asks
+            while (!newOrder->isFilled() && !asks_.empty()) {
+                auto& [price, orders] = *asks_.begin();
 
-        while (!newOrder->isFilled() && !oppositeBook.empty()) {
-            auto& [price, orders] = *oppositeBook.begin();
+                // Check if price is acceptable
+                if (price > newOrder->price) {
+                    break;
+                }
 
-            // Check if price is acceptable
-            bool priceAcceptable = (newOrder->side == OrderSide::BUY)
-                ? (price <= newOrder->price)
-                : (price >= newOrder->price);
+                while (!newOrder->isFilled() && !orders.empty()) {
+                    auto oppositeOrder = orders.front();
 
-            if (!priceAcceptable) {
-                break;
-            }
+                    double matchPrice = oppositeOrder->price;
+                    double matchQuantity = std::min(
+                        newOrder->getRemainingQuantity(),
+                        oppositeOrder->getRemainingQuantity()
+                    );
 
-            while (!newOrder->isFilled() && !orders.empty()) {
-                auto oppositeOrder = orders.front();
+                    auto trade = executeTrade(newOrder, oppositeOrder, matchPrice, matchQuantity);
+                    trades.push_back(trade);
 
-                double matchPrice = oppositeOrder->price;
-                double matchQuantity = std::min(
-                    newOrder->getRemainingQuantity(),
-                    oppositeOrder->getRemainingQuantity()
-                );
+                    if (oppositeOrder->isFilled()) {
+                        orders.erase(orders.begin());
+                    }
+                }
 
-                auto trade = executeTrade(
-                    (newOrder->side == OrderSide::BUY) ? newOrder : oppositeOrder,
-                    (newOrder->side == OrderSide::SELL) ? newOrder : oppositeOrder,
-                    matchPrice,
-                    matchQuantity
-                );
-
-                trades.push_back(trade);
-
-                if (oppositeOrder->isFilled()) {
-                    orders.erase(orders.begin());
+                if (orders.empty()) {
+                    asks_.erase(asks_.begin());
                 }
             }
+        } else {
+            // Sell order matches against bids
+            while (!newOrder->isFilled() && !bids_.empty()) {
+                auto& [price, orders] = *bids_.begin();
 
-            if (orders.empty()) {
-                oppositeBook.erase(oppositeBook.begin());
+                // Check if price is acceptable
+                if (price < newOrder->price) {
+                    break;
+                }
+
+                while (!newOrder->isFilled() && !orders.empty()) {
+                    auto oppositeOrder = orders.front();
+
+                    double matchPrice = oppositeOrder->price;
+                    double matchQuantity = std::min(
+                        newOrder->getRemainingQuantity(),
+                        oppositeOrder->getRemainingQuantity()
+                    );
+
+                    auto trade = executeTrade(oppositeOrder, newOrder, matchPrice, matchQuantity);
+                    trades.push_back(trade);
+
+                    if (oppositeOrder->isFilled()) {
+                        orders.erase(orders.begin());
+                    }
+                }
+
+                if (orders.empty()) {
+                    bids_.erase(bids_.begin());
+                }
             }
         }
     }
@@ -155,18 +196,31 @@ bool OrderBook::cancelOrder(uint64_t orderId) {
     auto order = it->second;
 
     // Remove from bid/ask book
-    auto& book = (order->side == OrderSide::BUY) ? bids_ : asks_;
-    auto priceLevel = book.find(order->price);
+    if (order->side == OrderSide::BUY) {
+        auto priceLevel = bids_.find(order->price);
+        if (priceLevel != bids_.end()) {
+            auto& orders = priceLevel->second;
+            orders.erase(
+                std::remove(orders.begin(), orders.end(), order),
+                orders.end()
+            );
 
-    if (priceLevel != book.end()) {
-        auto& orders = priceLevel->second;
-        orders.erase(
-            std::remove(orders.begin(), orders.end(), order),
-            orders.end()
-        );
+            if (orders.empty()) {
+                bids_.erase(priceLevel);
+            }
+        }
+    } else {
+        auto priceLevel = asks_.find(order->price);
+        if (priceLevel != asks_.end()) {
+            auto& orders = priceLevel->second;
+            orders.erase(
+                std::remove(orders.begin(), orders.end(), order),
+                orders.end()
+            );
 
-        if (orders.empty()) {
-            book.erase(priceLevel);
+            if (orders.empty()) {
+                asks_.erase(priceLevel);
+            }
         }
     }
 

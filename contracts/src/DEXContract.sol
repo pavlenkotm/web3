@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
@@ -51,7 +51,7 @@ contract DEXContract is ReentrancyGuard, Ownable {
     event OrderCancelled(uint256 indexed orderId);
     event TradeExecuted(uint256 indexed buyOrderId, uint256 indexed sellOrderId, uint256 price, uint256 quantity);
 
-    constructor() {}
+    constructor() Ownable(msg.sender) {}
 
     /**
      * @dev Deposit tokens into the exchange
