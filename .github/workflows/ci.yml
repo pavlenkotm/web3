@@ -1,0 +1,212 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  solidity:
+    name: Test Solidity Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile contracts
+        run: npx hardhat compile
+
+      - name: Run tests
+        run: npx hardhat test
+
+      - name: Run coverage
+        run: npx hardhat coverage
+
+  python:
+    name: Test Python CLI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          cd python/web3-cli
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Run tests
+        run: |
+          cd python/web3-cli
+          pytest --cov=web3cli tests/
+
+  typescript:
+    name: Test TypeScript DApp
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          cd typescript/wallet-connect-dapp
+          npm ci
+
+      - name: Type check
+        run: |
+          cd typescript/wallet-connect-dapp
+          npm run build
+
+      - name: Lint
+        run: |
+          cd typescript/wallet-connect-dapp
+          npm run lint
+
+  go:
+    name: Test Go RPC Client
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Build
+        run: |
+          cd go/eth-rpc-client
+          go build -v ./...
+
+      - name: Test
+        run: |
+          cd go/eth-rpc-client
+          go test -v ./...
+
+  rust:
+    name: Test Rust Solana Program
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Cache Cargo
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            rust/solana-token-program/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build
+        run: |
+          cd rust/solana-token-program
+          cargo build --verbose
+
+      - name: Test
+        run: |
+          cd rust/solana-token-program
+          cargo test --verbose
+
+  cpp:
+    name: Test C++ DEX Engine
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake g++
+
+      - name: Build
+        run: |
+          mkdir -p build
+          cd build
+          cmake ..
+          make
+
+  c:
+    name: Test C Crypto Library
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install GCC
+        run: sudo apt-get update && sudo apt-get install -y gcc
+
+      - name: Build
+        run: |
+          cd c/crypto-lib
+          gcc -c src/keccak.c -Iinclude -o keccak.o
+          ar rcs libcrypto.a keccak.o
+
+  lint:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Solidity Lint
+        run: |
+          npm install -g solhint
+          solhint 'contracts/**/*.sol'
+
+      - name: Markdown Lint
+        uses: avto-dev/markdown-lint@v1
+        with:
+          args: '**/*.md'
+
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Slither
+        uses: crytic/slither-action@v0.3.0
+        with:
+          sarif: results.sarif
+        continue-on-error: true
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.sarif
