@@ -2,10 +2,10 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/pavlenkotm/web3/actions/workflows/ci.yml/badge.svg)](https://github.com/pavlenkotm/web3/actions)
-[![Languages](https://img.shields.io/badge/languages-15+-blue.svg)](#supported-languages)
+[![Languages](https://img.shields.io/badge/languages-21+-blue.svg)](#supported-languages)
 [![Commits](https://img.shields.io/github/commit-activity/m/pavlenkotm/web3)](https://github.com/pavlenkotm/web3/commits)
 
-> Professional Web3 development showcase across **15+ programming languages**. From Solidity smart contracts to Rust Solana programs, Python CLIs to Swift iOS SDKs - demonstrating blockchain development expertise across the entire stack.
+> Professional Web3 development showcase across **21+ programming languages**. From Solidity smart contracts to Rust Solana programs, Cairo StarkNet contracts to Plutus Cardano validators - demonstrating blockchain development expertise across the entire stack and all major blockchain ecosystems.
 
 ## ⚡ Quick Links
 
@@ -20,10 +20,11 @@
 
 ## 🔥 Features
 
-- **15+ Programming Languages**: Comprehensive coverage from low-level C to high-level Python
+- **21+ Programming Languages**: Comprehensive coverage from low-level C to high-level Python
 - **Production-Ready Code**: Professional-grade implementations with tests and documentation
-- **Multi-Chain Support**: Ethereum, Solana, Aptos, Polygon, and more
+- **Multi-Chain Support**: Ethereum, Solana, Aptos, StarkNet, Polkadot, Cardano, Cosmos, ICP, Stacks, and more
 - **Full Stack**: Smart contracts, backends, frontends, mobile apps, and DevOps
+- **All Major Blockchain Languages**: Solidity, Vyper, Rust, Move, Cairo, Ink!, Plutus, Clarity, Motoko
 - **Security First**: Best practices, audits, and formal verification
 - **Comprehensive Tests**: Unit tests, integration tests, and CI/CD
 - **Rich Documentation**: Detailed READMEs, code comments, and examples
@@ -32,16 +33,29 @@
 
 ## 📚 Supported Languages
 
+### Blockchain Smart Contract Languages
+
+| Language | Project | Description | Blockchain | Status |
+|----------|---------|-------------|------------|--------|
+| **Solidity** | [contracts/](contracts/) | ERC-20, ERC-721, DEX contracts | Ethereum, EVM | ✅ Complete |
+| **Vyper** | [vyper/](vyper/) | Pythonic ERC-20 token | Ethereum, EVM | ✅ Complete |
+| **Cairo** | [cairo/](cairo/) | StarkNet token contract | StarkNet | ✅ Complete |
+| **Ink!** | [ink/](ink/) | Polkadot ERC-20 token | Polkadot, Substrate | ✅ Complete |
+| **Clarity** | [clarity/](clarity/) | SIP-010 fungible token | Stacks, Bitcoin L2 | ✅ Complete |
+| **Motoko** | [motoko/](motoko/) | ICP token canister | Internet Computer | ✅ Complete |
+| **Haskell (Plutus)** | [haskell/](haskell/) | Cardano token validator | Cardano | ✅ Complete |
+| **Rust** | [rust/](rust/) | Solana Anchor token program | Solana, NEAR | ✅ Complete |
+| **Move** | [move/](move/) | Aptos resource-oriented token | Aptos, Sui | ✅ Complete |
+| **Go** | [go/cosmos-sdk-module/](go/cosmos-sdk-module/) | Cosmos SDK token module | Cosmos SDK | ✅ Complete |
+
+### General Purpose Languages
+
 | Language | Project | Description | Status |
 |----------|---------|-------------|--------|
-| **Solidity** | [contracts/](contracts/) | ERC-20, ERC-721, DEX contracts | ✅ Complete |
-| **Vyper** | [vyper/](vyper/) | Pythonic ERC-20 token | ✅ Complete |
-| **Rust** | [rust/](rust/) | Solana Anchor token program | ✅ Complete |
-| **Move** | [move/](move/) | Aptos resource-oriented token | ✅ Complete |
 | **TypeScript** | [typescript/](typescript/) | Wagmi v2 DApp frontend | ✅ Complete |
 | **JavaScript** | [web3/](web3/) | Web3.js integration | ✅ Complete |
 | **Python** | [python/](python/) | Web3.py CLI and scripts | ✅ Complete |
-| **Go** | [go/](go/) | Ethereum RPC client | ✅ Complete |
+| **Go** | [go/eth-rpc-client/](go/eth-rpc-client/) | Ethereum RPC client | ✅ Complete |
 | **Java** | [java/](java/) | Web3j wallet application | ✅ Complete |
 | **Kotlin** | [kotlin/](kotlin/) | Android wallet with Compose | ✅ Complete |
 | **Swift** | [swift/](swift/) | iOS/macOS wallet SDK | ✅ Complete |
@@ -95,6 +109,51 @@ move/aptos-token/sources/token.move
 - Formal verification support
 - [📖 Documentation](move/)
 
+#### Cairo - StarkNet Contracts
+```cairo
+// StarkNet token with Cairo 2.x
+cairo/starknet-token/src/token.cairo
+```
+- Modern Cairo syntax
+- ZK-rollup optimized
+- [📖 Documentation](cairo/)
+
+#### Ink! - Polkadot Contracts
+```rust
+// Substrate smart contracts
+ink/polkadot-token/src/lib.rs
+```
+- WebAssembly-based
+- Rust ecosystem integration
+- [📖 Documentation](ink/)
+
+#### Clarity - Stacks Contracts
+```clarity
+;; Bitcoin L2 smart contracts
+clarity/stacks-token/contracts/sip-010-token.clar
+```
+- Decidable language
+- Bitcoin-secured
+- [📖 Documentation](clarity/)
+
+#### Motoko - Internet Computer
+```motoko
+// ICP canister implementation
+motoko/icp-token/src/Token.mo
+```
+- Actor-based model
+- Orthogonal persistence
+- [📖 Documentation](motoko/)
+
+#### Haskell - Cardano Plutus
+```haskell
+-- UTXO-based smart contracts
+haskell/cardano-plutus/src/SimpleToken.hs
+```
+- Plutus V2
+- Formal verification
+- [📖 Documentation](haskell/)
+
 ---
 
 ### 💻 Backend & CLI
@@ -125,6 +184,16 @@ wallet.sendTransaction(toAddress, amount);
 - Enterprise-grade
 - Maven build
 - [📖 Documentation](java/web3j-wallet/)
+
+#### Go - Cosmos SDK Module
+```go
+// Custom blockchain module for Cosmos SDK
+k.Transfer(ctx, from, to, "utoken", amount)
+balance := k.GetBalance(ctx, addr, "utoken")
+```
+- IBC-compatible
+- State machine replication
+- [📖 Documentation](go/cosmos-sdk-module/)
 
 ---
 
@@ -282,6 +351,10 @@ web3/
 │   └── deployment-scripts/        # Deployment automation
 ├── c/
 │   └── crypto-lib/                # Keccak-256 library
+├── cairo/
+│   └── starknet-token/            # StarkNet contracts
+├── clarity/
+│   └── stacks-token/              # Stacks/Bitcoin L2 contracts
 ├── contracts/
 │   ├── src/                       # Solidity contracts
 │   └── test/                      # Hardhat tests
@@ -289,13 +362,20 @@ web3/
 │   ├── include/                   # C++ headers
 │   └── src/                       # DEX engine
 ├── go/
+│   ├── cosmos-sdk-module/         # Cosmos SDK module
 │   └── eth-rpc-client/            # Go Ethereum client
+├── haskell/
+│   └── cardano-plutus/            # Cardano Plutus contracts
 ├── html-css/
 │   └── dapp-landing/              # Landing page
+├── ink/
+│   └── polkadot-token/            # Polkadot/Substrate contracts
 ├── java/
 │   └── web3j-wallet/              # Java wallet
 ├── kotlin/
 │   └── android-wallet/            # Android app
+├── motoko/
+│   └── icp-token/                 # Internet Computer canisters
 ├── move/
 │   └── aptos-token/               # Aptos contracts
 ├── python/
@@ -335,6 +415,11 @@ graph TD
 
 - [Solidity Contracts](contracts/README.md)
 - [Vyper ERC-20](vyper/erc20-token/README.md)
+- [Cairo StarkNet Token](cairo/starknet-token/README.md)
+- [Ink! Polkadot Token](ink/polkadot-token/README.md)
+- [Clarity Stacks Token](clarity/stacks-token/README.md)
+- [Motoko ICP Token](motoko/icp-token/README.md)
+- [Haskell Plutus Contract](haskell/cardano-plutus/README.md)
 - [Rust Solana Program](rust/solana-token-program/README.md)
 - [Move Aptos Token](move/aptos-token/README.md)
 
@@ -342,6 +427,7 @@ graph TD
 
 - [Python Web3 CLI](python/web3-cli/README.md)
 - [Go RPC Client](go/eth-rpc-client/README.md)
+- [Go Cosmos SDK Module](go/cosmos-sdk-module/README.md)
 - [Java Web3j Wallet](java/web3j-wallet/README.md)
 
 ### Frontend & Mobile
@@ -457,7 +543,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🎯 Project Stats
 
-- **15+ Languages**: Comprehensive Web3 coverage
+- **21+ Languages**: Comprehensive Web3 coverage across all major blockchains
+- **10 Blockchain Platforms**: Ethereum, Solana, StarkNet, Polkadot, Cardano, Cosmos, ICP, Stacks, Aptos, Sui
 - **40+ Commits**: Active development history
 - **100% Open Source**: MIT Licensed
 - **CI/CD**: Automated testing and deployment
